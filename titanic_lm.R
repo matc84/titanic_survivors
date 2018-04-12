@@ -136,5 +136,25 @@ passenger_id <- as.data.frame(seq(892,1309))
 
 my_predicted_data <- cbind(passenger_id, surv_col)
 names(my_predicted_data) <- c("PassengerId", "Survived")
-write.csv(my_predicted_data, "my_predictions_lm_1.csv", row.names = FALSE)
+write.csv(my_predicted_data, "my_predictions_lm_6.csv", row.names = FALSE)
+
+# look at table(my_predicted_data$Survived)
+# look at the stats on the real-life titanic and our data
+# 31% of people survived, but our model predicted 35.1%
+# off by 11.43%
+# smooth out the results
+
+surv_col <- as.data.frame(predict(model, test))
+names(surv_col) <- "surv"
+surv_col$surv <- surv_col$surv -0.1
+surv_col$surv <- round(surv_col$surv)
+table(surv_col$surv)
+
+passenger_id <- as.data.frame(seq(892,1309))
+
+my_predicted_data <- cbind(passenger_id, surv_col)
+names(my_predicted_data) <- c("PassengerId", "Survived")
+write.csv(my_predicted_data, "my_predictions_lm_2.csv", row.names = FALSE)
+
+# for a score of 0.79425 on kaggle
 
