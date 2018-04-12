@@ -72,6 +72,18 @@ model
 summary(model)
 
 
+## try to improve the model
+train$Age2 <- train$Age^2
+train$Fare2 <- train$Fare^2
+train$Fare_over_mean <- ifelse(train$Fare >= 30, 1 ,0)
+
+model2 <- lm(Survived ~ Pclass + Sex + Age + Age2 + SibSp + Fare_over_mean + Fare2 + 
+                     Sex*Pclass + Sex*Age + Sex*Fare_over_mean + Sex*Age2 + 
+                     Sex*SibSp + Pclass*Age + Pclass*Age2 + Pclass*SibSp + Pclass*Fare_over_mean + 
+                     Age2*SibSp + Age2*Fare_over_mean + SibSp*Fare_over_mean, 
+             data = train)
+summary(model2)
+
 ######################################
 ## make adjustments on the test set ##
 ######################################
@@ -158,3 +170,20 @@ write.csv(my_predicted_data, "my_predictions_lm_2.csv", row.names = FALSE)
 
 # for a score of 0.79425 on kaggle
 
+## try with the improved model
+
+test$Age2 <- test$Age^2
+test$Fare2 <- test$Fare^2
+test$Fare_over_mean <- ifelse(test$Fare >= 30, 1 ,0)
+
+surv_col <- as.data.frame(predict(model2, test))
+names(surv_col) <- "surv"
+surv_col$surv <- surv_col$surv
+surv_col$surv <- round(surv_col$surv)
+table(surv_col$surv)
+
+passenger_id <- as.data.frame(seq(892,1309))
+
+my_predicted_data <- cbind(passenger_id, surv_col)
+names(my_predicted_data) <- c("PassengerId", "Survived")
+write.csv(my_predicted_data, "my_predictions_lm_7.csv", row.names = FALSE)
